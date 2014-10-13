@@ -56,8 +56,6 @@ public class MarkDAOImpl extends GenericDAOImpl<Mark, Integer> implements
 		try {
 			TypedQuery<Mark> ctq = entityManager.createQuery(query);
 			result = ctq.getResultList();
-		} catch (Exception e) {
-			LOG.error("Find any mark", e);
 		} finally {
 			entityManager.close();
 		}

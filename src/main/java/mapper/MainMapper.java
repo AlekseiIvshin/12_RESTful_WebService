@@ -9,11 +9,11 @@ import ma.glasnost.orika.impl.DefaultMapperFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import restservice.elements.CarElement;
-import restservice.elements.CustomerElement;
-import restservice.elements.MerchantElement;
-import restservice.elements.SalesElement;
-import restservice.elements.StoreElement;
+import rest.elements.CarElement;
+import rest.elements.CustomerElement;
+import rest.elements.MerchantElement;
+import rest.elements.SalesElement;
+import rest.elements.StoreElement;
 import dao.car.modification.Modification;
 import dao.customer.Customer;
 import dao.merchant.Merchant;

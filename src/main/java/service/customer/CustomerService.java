@@ -9,17 +9,17 @@ import domain.CustomerDomain;
  * @author Aleksei_Ivshin
  *
  */
-public interface CustomerService 
-		extends DomainService<CustomerDomain, Integer> {
+public interface CustomerService extends DomainService<CustomerDomain, Integer> {
 
 	/**
 	 * Find customer by passport.
 	 * 
-	 * @param customer
-	 *            some customer data
+	 * @param series
+	 *            customer passport series
+	 * 
+	 * @param number
+	 *            customer passport series
 	 * @return founded customer
 	 */
-	CustomerDomain findByPassport(CustomerDomain customer);
-
 	CustomerDomain findByPassport(String series, String number);
 }

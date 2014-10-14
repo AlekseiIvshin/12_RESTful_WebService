@@ -68,7 +68,7 @@ public abstract class DomainServiceImpl<DomainClass, DomainId, Model, IdType,
 		this.domainType = (Class<DomainClass>) ((ParameterizedType) getClass()
 				.getGenericSuperclass()).getActualTypeArguments()[0];
 		this.modelType = (Class<Model>) ((ParameterizedType) getClass()
-				.getGenericSuperclass()).getActualTypeArguments()[3];
+				.getGenericSuperclass()).getActualTypeArguments()[2];
 		mapper = new MainMapper();
 	}
 

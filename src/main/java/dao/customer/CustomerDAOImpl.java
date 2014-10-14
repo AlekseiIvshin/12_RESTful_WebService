@@ -2,6 +2,7 @@ package dao.customer;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -74,15 +75,17 @@ public class CustomerDAOImpl extends GenericDAOImpl<Customer, Integer>
 		CriteriaQuery<Customer> query = builder.createQuery(Customer.class);
 		Root<Customer> resultCustomer = query.from(Customer.class);
 		query.where(
-				builder.equal(resultCustomer.get(Customer_.passportSeries),
-						series))
-				.where(builder.equal(
-						resultCustomer.get(Customer_.passportNumber), number))
-				.select(resultCustomer);
+				builder.and(builder.equal(
+						resultCustomer.get(Customer_.passportSeries), series),
+						builder.equal(
+								resultCustomer.get(Customer_.passportNumber),
+								number))).select(resultCustomer);
 		Customer result = null;
 		try {
 			TypedQuery<Customer> ctq = entityManager.createQuery(query);
 			result = ctq.getSingleResult();
+		}catch(NoResultException e){
+			return null;
 		} finally {
 			entityManager.close();
 		}

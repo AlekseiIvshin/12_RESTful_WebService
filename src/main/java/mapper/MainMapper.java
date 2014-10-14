@@ -126,6 +126,9 @@ public class MainMapper implements Mapper {
 	 */
 	public final <FromClass, ToClass> ToClass map(final FromClass object,
 			final Class<ToClass> toClass) {
+		if(object == null){
+			return null;
+		}
 		MapperFacade mapperFacade = mapperFactory.getMapperFacade();
 		return mapperFacade.map(object, toClass);
 	}

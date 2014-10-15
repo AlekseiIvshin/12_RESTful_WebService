@@ -26,7 +26,7 @@ import rest.elements.JsonExceptionData;
 import service.customer.CustomerService;
 import service.customer.CustomerServiceImpl;
 
-@Path("customer")
+@Path("/customer")
 public class CustomerResourceImpl implements CustomerResource {
 	static final Logger logger = LoggerFactory
 			.getLogger(CustomerResourceImpl.class);
@@ -36,7 +36,7 @@ public class CustomerResourceImpl implements CustomerResource {
 	ObjectMapper jsonMapper = new ObjectMapper();
 
 	@GET
-	@Path("/{id: [0-9]*}")
+	@Path("/id/{id: [0-9]*}")
 	@Produces("application/json")
 	public Response getById(@PathParam("id") int id) {
 		CustomerElement customer;

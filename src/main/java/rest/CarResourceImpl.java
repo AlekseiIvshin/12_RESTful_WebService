@@ -4,11 +4,11 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.websocket.server.PathParam;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -27,6 +27,7 @@ import service.car.CarService;
 import service.car.CarServiceImpl;
 import domain.CarDomain;
 
+@Path("/car")
 public class CarResourceImpl implements CarResource {
 	static final Logger logger = LoggerFactory.getLogger(CarResourceImpl.class);
 
@@ -49,6 +50,7 @@ public class CarResourceImpl implements CarResource {
 
 	@GET
 	@Path("/{markName}/{modelName}/{modification}")
+	@Consumes("text/plain")
 	@Produces("application/json")
 	public Response getCarByName(@PathParam("markName") String markName,
 			@PathParam("modelName") String modelName,

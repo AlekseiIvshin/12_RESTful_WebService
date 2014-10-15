@@ -14,6 +14,10 @@ public class JsonExceptionData {
 		return new JsonExceptionData(exceptionClass, message);
 	}
 	
+	public static JsonExceptionData withError(Throwable exception){
+		return new JsonExceptionData(exception.getClass().getName(), exception.getMessage());
+	}
+	
 	private JsonExceptionData(){
 		status = -1;
 		exceptionClass = null;

@@ -45,7 +45,7 @@ public class CustomerResourceImpl implements CustomerResource {
 		JsonData<CustomerElement> data;
 		if (customer == null) {
 			data = new JsonData<CustomerElement>(null,
-					JsonExceptionData.withError("SqlException", "Not founded"));
+					JsonExceptionData.withError("SqlException", "Not exist"));
 		} else {
 			data = new JsonData<CustomerElement>(customer,
 					JsonExceptionData.none());
@@ -73,7 +73,7 @@ public class CustomerResourceImpl implements CustomerResource {
 		JsonData<CustomerElement> data;
 		if (customer == null) {
 			data = new JsonData<CustomerElement>(null,
-					JsonExceptionData.withError("SqlException", "Not founded"));
+					JsonExceptionData.withError("SqlException", "Not exist"));
 		} else {
 			data = new JsonData<CustomerElement>(customer,
 					JsonExceptionData.none());

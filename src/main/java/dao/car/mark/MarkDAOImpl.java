@@ -122,4 +122,21 @@ public class MarkDAOImpl extends GenericDAOImpl<Mark, Integer> implements
 		return result;
 	}
 
+	@Override
+	public List<Mark> findMarks() {
+		EntityManager entityManager = entityManagerFactory
+				.createEntityManager();
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Mark> query = builder.createQuery(Mark.class);
+		Root<Mark> root = query.from(Mark.class);
+		query.select(root);
+		List<Mark> result = null;
+		try {
+			result = entityManager.createQuery(query).getResultList();
+		} finally {
+			entityManager.close();
+		}
+		return result;
+	}
+
 }

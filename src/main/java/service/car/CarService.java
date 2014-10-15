@@ -42,9 +42,13 @@ public interface CarService extends DomainService<CarDomain, Long> {
 	 * @return founded car
 	 * @throws Exception 
 	 */
-	CarDomain findOne(String mark, String model, String modification) throws Exception;
+	CarDomain findOne(String mark, String model, String modification) throws SQLException;
 
-	List<String> getMarks();
+	List<CarDomain> getMarks();
 	
 	List<CarDomain> findByMarkAndModel(String markName, String modelName);
+
+	List<CarDomain> getModels(long markId);
+
+	List<CarDomain> getModifications(long modelId);
 }

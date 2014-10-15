@@ -126,14 +126,14 @@ public class CarResourceImpl implements CarResource {
 					"MapperException", "Can not parse data"));
 			return getResponse(jsonData);
 		}
-		if (carRecieved != null) {
-			CarDomain mapped = mainMapper.map(carRecieved, CarDomain.class);
-
+		CarDomain mapped = mainMapper.map(carRecieved, CarDomain.class);
+		if (mapped != null) {
 			String id;
 			JsonExceptionData exception;
 			try {
 
-				CarDomain persisted = carService.create(mapped);
+				CarDomain persisted = carService.addCar(mapped.getMark(),
+						mapped.getModel(), mapped.getModification());
 				id = persisted.getId() + "";
 				exception = JsonExceptionData.none();
 			} catch (SQLException e1) {

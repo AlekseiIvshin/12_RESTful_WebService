@@ -23,7 +23,7 @@ public interface CarService extends DomainService<CarDomain, Long> {
 	 * @throws SQLException 
 	 * @throws Exception 
 	 */
-	CarDomain addCar(String mark, String model, String modification) throws  Exception;
+	CarDomain addCar(String mark, String model, String modification) throws  SQLException;
 
 	/**
 	 * Remove car.

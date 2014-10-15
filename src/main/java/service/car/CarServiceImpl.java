@@ -58,7 +58,7 @@ public class CarServiceImpl
 	 * @throws SQLException some exception
 	 */
 	public final CarDomain addCar(final String mark, final String model,
-			final String modification) throws Exception {
+			final String modification) throws SQLException {
 		MarkDAO markDAO = new MarkDAOImpl(entityManagerFactory);
 		ModelDAO modelDAO = new ModelDAOImpl(entityManagerFactory);
 		ModificationDAO modifDAO = new ModificationDAOImpl(entityManagerFactory);
@@ -67,7 +67,7 @@ public class CarServiceImpl
 		CarModel modelData = modelDAO.findOrCreate(markData, model);
 		Modification modif = modifDAO.findOne(modelData, modification);
 		if (modif != null) {
-			Exception e = new Exception("Modification already exist: "+mark+" "+model+" "+modification);
+			SQLException e = new SQLException("Modification already exist: "+mark+" "+model+" "+modification);
 			LOG.error("Modification already exist",e);
 			throw e;
 		}

@@ -12,36 +12,27 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import mapper.MainMapper;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import rest.elements.CarElement;
 import rest.elements.JsonExceptionData;
-import rest.helpers.RequestDataParser;
-import rest.helpers.RequestDataParserImpl;
-import rest.helpers.ResponsePacker;
-import rest.helpers.ResponsePackerImpl;
 import service.car.CarService;
 import service.car.CarServiceImpl;
 import domain.CarDomain;
 
 @Path("/car")
-public class CarResourceImpl implements CarResource {
-	static final Logger logger = LoggerFactory.getLogger(CarResourceImpl.class);
+public class CarResourceImpl extends GenericRest<CarService> implements CarResource {
 
-	private final CarService carService = new CarServiceImpl();
-	private final MainMapper mainMapper = new MainMapper();
-	private final RequestDataParser requestParser = new RequestDataParserImpl();
-	private final ResponsePacker responsePacker = new ResponsePackerImpl();
+	public CarResourceImpl() {
+		super(new CarServiceImpl(), new MainMapper());
+	}
 
 	@GET
 	@Path("/id/{id: [0-9]*}")
 	@Consumes("text/plain")
 	@Produces("application/json")
 	public Response getCarById(@PathParam("id") long id) {
-		CarDomain foundCar = carService.get(id);
+		CarDomain foundCar =  service.get(id);
 
 		if (foundCar == null) {
 			return responsePacker.packError(JsonExceptionData.withError(
@@ -67,7 +58,7 @@ public class CarResourceImpl implements CarResource {
 			@PathParam("modification") String modification) {
 		CarDomain foundCar;
 		try {
-			foundCar = carService.findOne(markName, modelName, modification);
+			foundCar = service.findOne(markName, modelName, modification);
 		} catch (SQLException e) {
 			logger.error("Find car exception", e);
 			return responsePacker.packError(JsonExceptionData.withError(e));
@@ -86,7 +77,7 @@ public class CarResourceImpl implements CarResource {
 	@Path("/marks")
 	@Produces("application/json")
 	public Response getAllMarks() {
-		List<CarDomain> marks = carService.getMarks();
+		List<CarDomain> marks = service.getMarks();
 
 		if (marks == null || marks.isEmpty()) {
 			return responsePacker.packError(JsonExceptionData.withError(
@@ -106,7 +97,7 @@ public class CarResourceImpl implements CarResource {
 	@GET
 	@Path("/mark/{markId}/models")
 	public Response getAllModels(@PathParam("markId") long markId) {
-		List<CarDomain> cars = carService.getModels(markId);
+		List<CarDomain> cars = service.getModels(markId);
 
 		if (cars == null || cars.isEmpty()) {
 			return responsePacker.packError(JsonExceptionData.withError(
@@ -126,7 +117,7 @@ public class CarResourceImpl implements CarResource {
 	@GET
 	@Path("/model/{modelId}/modifications")
 	public Response getAllModifications(@PathParam("modelId") long modelId) {
-		List<CarDomain> cars = carService.getModifications(modelId);
+		List<CarDomain> cars = service.getModifications(modelId);
 		if (cars == null || cars.isEmpty()) {
 			return responsePacker.packError(JsonExceptionData.withError(
 					"SqlException", "Car marks not found"));
@@ -166,7 +157,7 @@ public class CarResourceImpl implements CarResource {
 		CarDomain persisted;
 		try {
 
-			persisted = carService.addCar(mapped.getMark(), mapped.getModel(),
+			persisted = service.addCar(mapped.getMark(), mapped.getModel(),
 					mapped.getModification());
 		} catch (SQLException e1) {
 			return responsePacker.packError(JsonExceptionData.withError(e1));

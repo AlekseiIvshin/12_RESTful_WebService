@@ -27,21 +27,19 @@ import service.customer.CustomerService;
 import service.customer.CustomerServiceImpl;
 
 @Path("/customer")
-public class CustomerResourceImpl implements CustomerResource {
-	static final Logger logger = LoggerFactory
-			.getLogger(CustomerResourceImpl.class);
+public class CustomerResourceImpl extends GenericRest<CustomerService> implements CustomerResource {
+	
+	public CustomerResourceImpl(){
+		super(new CustomerServiceImpl(), new MainMapper());
+	}
 
-	public CustomerService customerService = new CustomerServiceImpl();
-	private final MainMapper mainMapper = new MainMapper();
-	private final RequestDataParser requestParser = new RequestDataParserImpl();
-	private final ResponsePacker responsePacker = new ResponsePackerImpl();
 
 	@GET
 	@Path("/id/{id: [0-9]*}")
 	@Produces("application/json")
 	public Response getById(@PathParam("id") int id) {
 
-		CustomerDomain customerDomain = customerService.get(id);
+		CustomerDomain customerDomain = service.get(id);
 		if (customerDomain == null) {
 			return responsePacker.packError(JsonExceptionData.withError(
 					"SqlException", "Not exist"));
@@ -61,7 +59,7 @@ public class CustomerResourceImpl implements CustomerResource {
 	@Produces("application/json")
 	public Response getByPassport(@PathParam("series") String series,
 			@PathParam("number") String number) {
-		CustomerDomain customerDomain = customerService.findByPassport(series,
+		CustomerDomain customerDomain = service.findByPassport(series,
 				number);
 
 		if (customerDomain == null) {
@@ -100,7 +98,7 @@ public class CustomerResourceImpl implements CustomerResource {
 		}
 		CustomerDomain persisited;
 		try {
-			persisited = customerService.create(mapped);
+			persisited = service.create(mapped);
 		} catch (SQLException e) {
 			return responsePacker.packError(JsonExceptionData.withError(e));
 		}

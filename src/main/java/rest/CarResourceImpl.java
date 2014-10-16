@@ -23,6 +23,10 @@ import org.slf4j.LoggerFactory;
 import rest.elements.CarElement;
 import rest.elements.JsonData;
 import rest.elements.JsonExceptionData;
+import rest.helpers.RequestDataParser;
+import rest.helpers.RequestDataParserImpl;
+import rest.helpers.ResponsePacker;
+import rest.helpers.ResponsePackerImpl;
 import service.car.CarService;
 import service.car.CarServiceImpl;
 import domain.CarDomain;
@@ -34,18 +38,27 @@ public class CarResourceImpl implements CarResource {
 	public CarService carService = new CarServiceImpl();
 	MainMapper mainMapper = new MainMapper();
 	ObjectMapper jsonMapper = new ObjectMapper();
+	RequestDataParser requestParser = new RequestDataParserImpl();
+	ResponsePacker responsePacker = new ResponsePackerImpl();
 
 	@GET
 	@Path("/id/{id: [0-9]*}")
+	@Consumes("text/plain")
 	@Produces("application/json")
 	public Response getCarById(@PathParam("id") long id) {
 		CarDomain foundCar = carService.get(id);
 		CarElement mappedCar = mainMapper.map(foundCar, CarElement.class);
 
-		JsonData<CarElement> jsonData = packResponse(mappedCar,
-				JsonExceptionData.withError("SqlException", "Not exist"));
+		JsonData<CarElement> jsonData;
 
-		return getResponse(jsonData);
+		if (mappedCar == null) {
+			jsonData = responsePacker.packError(JsonExceptionData.withError(
+					"SqlException", "Not exist"));
+		} else {
+			jsonData = responsePacker.packOk(mappedCar);
+		}
+
+		return getResponseJsonOut(jsonData);
 	}
 
 	@GET
@@ -60,16 +73,22 @@ public class CarResourceImpl implements CarResource {
 			foundCar = carService.findOne(markName, modelName, modification);
 		} catch (SQLException e) {
 			logger.error("Find car exception", e);
-			return getResponse(packResponse(null,
-					JsonExceptionData.withError(e)));
+			return getResponseJsonOut(responsePacker.packError(JsonExceptionData
+					.withError(e)));
 		}
 
 		CarElement mappedCar = mainMapper.map(foundCar, CarElement.class);
 
-		JsonData<CarElement> jsonData = packResponse(mappedCar,
-				JsonExceptionData.withError("SqlException", "Not exist"));
+		JsonData<CarElement> jsonData;
 
-		return getResponse(jsonData);
+		if (mappedCar == null) {
+			jsonData = responsePacker.packError(JsonExceptionData.withError(
+					"SqlException", "Not exist"));
+		} else {
+			jsonData = responsePacker.packOk(mappedCar);
+		}
+
+		return getResponseJsonOut(jsonData);
 	}
 
 	@GET
@@ -79,10 +98,16 @@ public class CarResourceImpl implements CarResource {
 		List<CarDomain> marks = carService.getMarks();
 		List<CarElement> mapped = mainMapper.mapAsList(marks, CarElement.class);
 
-		JsonData<List<CarElement>> jsonData = packResponse(mapped,
-				JsonExceptionData.withError("SqlException",
-						"Car marks not found"));
-		return getResponse(jsonData);
+		JsonData<List<CarElement>> jsonData;
+
+		if (mapped == null) {
+			jsonData = responsePacker.packError(JsonExceptionData.withError(
+					"SqlException", "Car marks not found"));
+		} else {
+			jsonData = responsePacker.packOk(mapped);
+		}
+
+		return getResponseJsonOut(jsonData);
 	}
 
 	@GET
@@ -91,10 +116,16 @@ public class CarResourceImpl implements CarResource {
 		List<CarDomain> marks = carService.getModels(markId);
 		List<CarElement> mapped = mainMapper.mapAsList(marks, CarElement.class);
 
-		JsonData<List<CarElement>> jsonData = packResponse(mapped,
-				JsonExceptionData.withError("SqlException",
-						"Car marks not found"));
-		return getResponse(jsonData);
+		JsonData<List<CarElement>> jsonData;
+
+		if (mapped == null) {
+			jsonData = responsePacker.packError(JsonExceptionData.withError(
+					"SqlException", "Car models not found"));
+		} else {
+			jsonData = responsePacker.packOk(mapped);
+		}
+
+		return getResponseJsonOut(jsonData);
 	}
 
 	@GET
@@ -104,10 +135,16 @@ public class CarResourceImpl implements CarResource {
 		List<CarElement> mapped = mainMapper.mapAsList(modifications,
 				CarElement.class);
 
-		JsonData<List<CarElement>> jsonData = packResponse(mapped,
-				JsonExceptionData.withError("SqlException",
-						"Car marks not found"));
-		return getResponse(jsonData);
+		JsonData<List<CarElement>> jsonData;
+
+		if (mapped == null) {
+			jsonData = responsePacker.packError(JsonExceptionData.withError(
+					"SqlException", "Car modifications not found"));
+		} else {
+			jsonData = responsePacker.packOk(mapped);
+		}
+
+		return getResponseJsonOut(jsonData);
 	}
 
 	@Override
@@ -119,12 +156,12 @@ public class CarResourceImpl implements CarResource {
 		CarElement carRecieved = null;
 		JsonData<String> jsonData = null;
 		try {
-			carRecieved = jsonMapper.readValue(data, CarElement.class);
+			carRecieved = requestParser.parseData(data, CarElement.class);
 		} catch (IOException e1) {
 			logger.error("Map exception", e1);
-			jsonData = packResponse(null, JsonExceptionData.withError(
+			jsonData = responsePacker.packError(JsonExceptionData.withError(
 					"MapperException", "Can not parse data"));
-			return getResponse(jsonData);
+			return getResponseJsonOut(jsonData);
 		}
 		CarDomain mapped = mainMapper.map(carRecieved, CarDomain.class);
 		if (mapped != null) {
@@ -135,34 +172,23 @@ public class CarResourceImpl implements CarResource {
 				CarDomain persisted = carService.addCar(mapped.getMark(),
 						mapped.getModel(), mapped.getModification());
 				id = persisted.getId() + "";
-				exception = JsonExceptionData.none();
+				jsonData = responsePacker.packOk(id);
 			} catch (SQLException e1) {
-				id = null;
 				exception = JsonExceptionData.withError(e1);
+				jsonData = responsePacker.packError(exception);
 			}
-
-			jsonData = packResponse(id, exception);
 		}
-		return getResponse(jsonData);
+		return getResponseJsonOut(jsonData);
 
 	}
 
-	private <T> JsonData<T> packResponse(T data, JsonExceptionData possibleError) {
-		JsonData<T> jsonData;
-		if (data == null) {
-			jsonData = new JsonData<T>(null, possibleError);
-		} else {
-			jsonData = new JsonData<T>(data, JsonExceptionData.none());
-		}
-		return jsonData;
-	}
-
-	private Response getResponse(JsonData<?> data) {
+	private Response getResponseJsonOut(JsonData<?> data) {
 		try {
 			return Response.ok(jsonMapper.writeValueAsString(data),
 					MediaType.APPLICATION_JSON).build();
 		} catch (IOException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
+
 	}
 }

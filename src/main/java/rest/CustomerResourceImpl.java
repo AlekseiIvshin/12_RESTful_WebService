@@ -11,18 +11,18 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-
 import mapper.MainMapper;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import domain.CustomerDomain;
 import rest.elements.CustomerElement;
-import rest.elements.JsonData;
 import rest.elements.JsonExceptionData;
+import rest.helpers.RequestDataParser;
+import rest.helpers.RequestDataParserImpl;
+import rest.helpers.ResponsePacker;
+import rest.helpers.ResponsePackerImpl;
 import service.customer.CustomerService;
 import service.customer.CustomerServiceImpl;
 
@@ -32,32 +32,28 @@ public class CustomerResourceImpl implements CustomerResource {
 			.getLogger(CustomerResourceImpl.class);
 
 	public CustomerService customerService = new CustomerServiceImpl();
-	MainMapper mainMapper = new MainMapper();
-	ObjectMapper jsonMapper = new ObjectMapper();
+	private final MainMapper mainMapper = new MainMapper();
+	private final RequestDataParser requestParser = new RequestDataParserImpl();
+	private final ResponsePacker responsePacker = new ResponsePackerImpl();
 
 	@GET
 	@Path("/id/{id: [0-9]*}")
 	@Produces("application/json")
 	public Response getById(@PathParam("id") int id) {
-		CustomerElement customer;
-		customer = mainMapper.map(customerService.get(id),
+
+		CustomerDomain customerDomain = customerService.get(id);
+		if (customerDomain == null) {
+			return responsePacker.packError(JsonExceptionData.withError(
+					"SqlException", "Not exist"));
+		}
+		CustomerElement customer = mainMapper.map(customerDomain,
 				CustomerElement.class);
-		JsonData<CustomerElement> data;
 		if (customer == null) {
-			data = new JsonData<CustomerElement>(null,
-					JsonExceptionData.withError("SqlException", "Not exist"));
-		} else {
-			data = new JsonData<CustomerElement>(customer,
-					JsonExceptionData.none());
+			return responsePacker.packError(JsonExceptionData.withError(
+					"MapperException", "Mapping error"));
 		}
 
-		try {
-			return Response.ok(jsonMapper.writeValueAsString(data),
-					MediaType.APPLICATION_JSON).build();
-		} catch (IOException e) {
-			logger.error("Some exception", e);
-			return Response.ok(Status.INTERNAL_SERVER_ERROR).build();
-		}
+		return responsePacker.packOk(customer);
 	}
 
 	@GET
@@ -65,66 +61,49 @@ public class CustomerResourceImpl implements CustomerResource {
 	@Produces("application/json")
 	public Response getByPassport(@PathParam("series") String series,
 			@PathParam("number") String number) {
-		logger.debug("Request to find customer by passport {} {}", series,
+		CustomerDomain customerDomain = customerService.findByPassport(series,
 				number);
-		CustomerElement customer = mainMapper.map(
-				customerService.findByPassport(series, number),
+
+		if (customerDomain == null) {
+			return responsePacker.packError(JsonExceptionData.withError(
+					"SqlException", "Not exist"));
+		}
+		CustomerElement customer = mainMapper.map(customerDomain,
 				CustomerElement.class);
-		JsonData<CustomerElement> data;
 		if (customer == null) {
-			data = new JsonData<CustomerElement>(null,
-					JsonExceptionData.withError("SqlException", "Not exist"));
-		} else {
-			data = new JsonData<CustomerElement>(customer,
-					JsonExceptionData.none());
+			return responsePacker.packError(JsonExceptionData.withError(
+					"MapperException", "Mapping error"));
 		}
-		logger.debug("Data value: {}. Status: {}. Error message: {}", data
-				.getData(), data.getException().getStatus(), data
-				.getException().getExceptionMessage());
-		try {
-			return Response.ok(jsonMapper.writeValueAsString(data),
-					MediaType.APPLICATION_JSON).build();
-		} catch (IOException e) {
-			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-		}
+
+		return responsePacker.packOk(customer);
 	}
 
 	@POST
 	@Path("/new")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response createNewCustomerAndGetId(String customer) {
-		logger.debug("Received {}", customer);
-		CustomerElement customerReaded = null;
-		JsonData<String> data = null;
+		CustomerElement customerReaded;
 		try {
-			customerReaded = jsonMapper.readValue(customer,
+			customerReaded = requestParser.parseData(customer,
 					CustomerElement.class);
 		} catch (IOException e1) {
 			logger.error("Map exception", e1);
-			data = new JsonData<String>(null, JsonExceptionData.withError(
+			return responsePacker.packError(JsonExceptionData.withError(
 					"MapperException", "Can not parse data"));
 		}
-		if (customerReaded != null) {
-			logger.debug("New customer: {}", customerReaded);
-			logger.debug("New customer's birth date: {}",
-					customerReaded.getBirthDate());
-			try {
-				CustomerDomain mapped = mainMapper.map(customerReaded,
-						CustomerDomain.class);
-				CustomerDomain customerDomaint = customerService.create(mapped);
-				data = new JsonData<String>(customerDomaint.getId() + "",
-						JsonExceptionData.none());
-			} catch (SQLException e) {
-				data = new JsonData<String>(null, JsonExceptionData.withError(
-						"SQLException", e.getMessage()));
-			}
+
+		CustomerDomain mapped = mainMapper.map(customerReaded,
+				CustomerDomain.class);
+		if (mapped == null) {
+			return responsePacker.packError(JsonExceptionData.withError(
+					"MapperException", "Mapping error"));
 		}
+		CustomerDomain persisited;
 		try {
-			return Response.ok(jsonMapper.writeValueAsString(data),
-					MediaType.APPLICATION_JSON).build();
-		} catch (IOException e) {
-			logger.error("Map exception", e);
-			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			persisited = customerService.create(mapped);
+		} catch (SQLException e) {
+			return responsePacker.packError(JsonExceptionData.withError(e));
 		}
+		return responsePacker.packOk(String.valueOf(persisited.getId()));
 	}
 }

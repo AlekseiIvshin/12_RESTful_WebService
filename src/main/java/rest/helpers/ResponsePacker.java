@@ -1,10 +1,12 @@
 package rest.helpers;
 
+import javax.ws.rs.core.Response;
+
 import rest.elements.JsonData;
 import rest.elements.JsonExceptionData;
 
 public interface ResponsePacker {
 
-	<T> JsonData<T> packOk(T data);
-	<T> JsonData<T> packError(JsonExceptionData exception);
+	<T> Response packOk(T data);
+	<T> Response packError(JsonExceptionData exception);
 }

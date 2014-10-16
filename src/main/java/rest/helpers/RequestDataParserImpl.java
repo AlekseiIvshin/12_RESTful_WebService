@@ -8,9 +8,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import rest.elements.CarElement;
-import rest.elements.JsonExceptionData;
-
 public class RequestDataParserImpl implements RequestDataParser {
 
 	static final Logger logger = LoggerFactory

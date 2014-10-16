@@ -40,4 +40,6 @@ public interface SalesService extends DomainService<SalesDomain, Integer> {
 	 */
 	SalesDomain newSaleAndUpdateStore(CustomerDomain customer,
 			MerchantDomain merchant, CarDomain car) throws Exception;
+
+	SalesDomain newSaleAndUpdateStore(int customerId, int merchantId, long carId);
 }

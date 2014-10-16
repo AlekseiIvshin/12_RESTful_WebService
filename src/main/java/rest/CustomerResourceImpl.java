@@ -13,16 +13,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import mapper.MainMapper;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import domain.CustomerDomain;
 import rest.elements.CustomerElement;
 import rest.elements.JsonExceptionData;
-import rest.helpers.RequestDataParser;
-import rest.helpers.RequestDataParserImpl;
-import rest.helpers.ResponsePacker;
-import rest.helpers.ResponsePackerImpl;
 import service.customer.CustomerService;
 import service.customer.CustomerServiceImpl;
 

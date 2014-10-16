@@ -124,14 +124,15 @@ public class SalesDAOImpl extends GenericDAOImpl<Sales, Integer> implements
 		EntityManager entityManager = entityManagerFactory
 				.createEntityManager();
 
-		Store store = new StoreDAOImpl(entityManagerFactory).find(modification);
-		if (store == null || store.getCount() == 0) {
-			throw new NoResultException("Car " + modification.toString()
-					+ " is not exist in store.");
-		}
 		entityManager.getTransaction().begin();
 		Sales result = null;
 		try {
+			Store store = new StoreDAOImpl(entityManagerFactory)
+					.find(modification);
+			if (store == null || store.getCount() == 0) {
+				throw new NoResultException("Car " + modification.toString()
+						+ " is not exist in store.");
+			}
 			Sales sales = new Sales();
 			sales.setPrice(store.getPrice());
 			sales.setCustomer(customer);
@@ -145,7 +146,7 @@ public class SalesDAOImpl extends GenericDAOImpl<Sales, Integer> implements
 		} catch (Exception e) {
 			entityManager.getTransaction().rollback();
 			logger.error("Store can't update", e);
-		} finally{
+		} finally {
 			entityManager.close();
 		}
 		return result;

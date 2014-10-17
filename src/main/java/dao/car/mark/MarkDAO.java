@@ -40,4 +40,6 @@ public interface MarkDAO extends GenericDAO<Mark, Integer> {
 	Mark findOrCreate(String name);
 
 	List<String> findAllNames();
+
+	List<Mark> findMarks();
 }

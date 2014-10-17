@@ -1,6 +1,7 @@
 package dao.customer;
 
 import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -12,13 +13,14 @@ import javax.persistence.TemporalType;
 
 /**
  * Entity of table 'customer'.
+ * 
  * @author AlekseiIvshin
  *
  */
 @Entity
 @Table(name = "customer")
 public class Customer {
-	
+
 	/**
 	 * Customer id.
 	 */
@@ -26,48 +28,49 @@ public class Customer {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	@Column(name = "id_customer")
 	private int id;
-	
+
 	/**
 	 * Customer name.
 	 */
 	@Column(name = "name")
 	private String name;
-	
-	/** 
+
+	/**
 	 * Customer surname.
 	 */
 	@Column(name = "surname")
 	private String surname;
-	
+
 	/**
 	 * Customer patronymic.
 	 */
 	@Column(name = "patronic")
 	private String patronymic;
-	
+
 	/**
 	 * Customer passport series.
 	 */
 	@Column(name = "passport_series")
 	private String passportSeries;
-	
+
 	/**
 	 * Customer passport number.
 	 */
 	@Column(name = "passport_number")
 	private String passportNumber;
-	
+
 	/**
 	 * Customer birth date.
 	 */
 	@Column(name = "birthdate")
 	@Temporal(TemporalType.DATE)
 	private Date birthDate;
-	
+
 	/**
 	 * Default constructor.
 	 */
-	public Customer() { }
+	public Customer() {
+	}
 
 	public int getId() {
 		return id;
@@ -127,8 +130,9 @@ public class Customer {
 
 	@Override
 	public String toString() {
-		return "CustomerDomain [id="+id+", surname="+surname+", name="+name
-				+ ", patronymic="+patronymic
-				+ ", passport="+passportSeries+" "+passportNumber+"]";
+		return "CustomerDomain [id=" + id + ", surname=" + surname + ", name="
+				+ name + ", patronymic=" + patronymic + ", passport="
+				+ passportSeries + " " + passportNumber + "]";
 	}
+
 }

@@ -15,7 +15,7 @@ public class Publisher {
         // create jersey-grizzly server
         ResourceConfig rc = new PackagesResourceConfig("rest");
         HttpServer server = GrizzlyServerFactory.createHttpServer(
-                "http://localhost:8088", rc);
+                "http://localhost:8080", rc);
         try {
             server.start();
             System.out.println("Press any key to stop the server...");

@@ -14,6 +14,8 @@ import rest.elements.CustomerElement;
 import rest.elements.MerchantElement;
 import rest.elements.SalesElement;
 import rest.elements.StoreElement;
+import dao.car.mark.Mark;
+import dao.car.model.CarModel;
 import dao.car.modification.Modification;
 import dao.customer.Customer;
 import dao.merchant.Merchant;
@@ -74,6 +76,18 @@ public class MainMapper implements Mapper {
 				.constructorA("id").field("id", "id")
 				.field("mark", "model.mark.name").field("model", "model.name")
 				.field("modification", "name").register();
+		
+
+		// Car domain to Car Model entity
+		mapperFactory.classMap(CarDomain.class, CarModel.class)
+				.constructorA("id").field("id", "id")
+				.field("mark", "mark.name").field("model", "name").register();
+		
+
+		// Car domain to Car Mark entity
+		mapperFactory.classMap(CarDomain.class, Mark.class)
+				.constructorA("id").field("id", "id")
+				.field("mark", "name").register();
 
 		// Store domain to Store entity
 		mapperFactory.classMap(StoreDomain.class, Store.class)

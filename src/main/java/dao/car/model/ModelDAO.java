@@ -45,4 +45,6 @@ public interface ModelDAO extends GenericDAO<CarModel, Integer> {
 	 * @return founded or created model
 	 */
 	CarModel findOrCreate(Mark mark, String name);
+
+	List<CarModel> getModels(long markId);
 }

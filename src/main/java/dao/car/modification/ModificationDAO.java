@@ -35,5 +35,7 @@ public interface ModificationDAO extends GenericDAO<Modification, Long> {
 
 
 	List<Modification> findByMark(String markName);
+
+	List<Modification> getModifications(long modelId);
 	
 }

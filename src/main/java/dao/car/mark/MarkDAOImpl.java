@@ -56,8 +56,6 @@ public class MarkDAOImpl extends GenericDAOImpl<Mark, Integer> implements
 		try {
 			TypedQuery<Mark> ctq = entityManager.createQuery(query);
 			result = ctq.getResultList();
-		} catch (Exception e) {
-			LOG.error("Find any mark", e);
 		} finally {
 			entityManager.close();
 		}
@@ -116,6 +114,23 @@ public class MarkDAOImpl extends GenericDAOImpl<Mark, Integer> implements
 		Root<Mark> root = query.from(Mark.class);
 		query.multiselect(root.get(Mark_.name));
 		List<String> result = null;
+		try {
+			result = entityManager.createQuery(query).getResultList();
+		} finally {
+			entityManager.close();
+		}
+		return result;
+	}
+
+	@Override
+	public List<Mark> findMarks() {
+		EntityManager entityManager = entityManagerFactory
+				.createEntityManager();
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Mark> query = builder.createQuery(Mark.class);
+		Root<Mark> root = query.from(Mark.class);
+		query.select(root);
+		List<Mark> result = null;
 		try {
 			result = entityManager.createQuery(query).getResultList();
 		} finally {

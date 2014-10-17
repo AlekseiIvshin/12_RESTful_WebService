@@ -1,4 +1,4 @@
-package restservice.elements;
+package rest.elements;
 
 import java.util.Date;
 
@@ -110,12 +110,5 @@ public class CustomerElement{
 
 	public void setBirthDate(Date birthDate) {
 		this.birthDate = birthDate;
-	}
-
-	@Override
-	public final String toString() {
-		return "CustomerDomain [id=" + id + ", surname=" + surname + ", name="
-				+ name + ", patronymic=" + patronymic + ", passport="
-				+ passportSeries + " " + passportNumber + "]";
 	}
 }

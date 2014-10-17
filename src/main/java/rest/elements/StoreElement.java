@@ -1,4 +1,4 @@
-package restservice.elements;
+package rest.elements;
 
 
 /**

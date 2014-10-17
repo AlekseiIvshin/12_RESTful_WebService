@@ -58,7 +58,7 @@ public class CarServiceImpl
 	 * @throws SQLException some exception
 	 */
 	public final CarDomain addCar(final String mark, final String model,
-			final String modification) throws Exception {
+			final String modification) throws SQLException {
 		MarkDAO markDAO = new MarkDAOImpl(entityManagerFactory);
 		ModelDAO modelDAO = new ModelDAOImpl(entityManagerFactory);
 		ModificationDAO modifDAO = new ModificationDAOImpl(entityManagerFactory);
@@ -67,7 +67,7 @@ public class CarServiceImpl
 		CarModel modelData = modelDAO.findOrCreate(markData, model);
 		Modification modif = modifDAO.findOne(modelData, modification);
 		if (modif != null) {
-			Exception e = new Exception("Modification already exist: "+mark+" "+model+" "+modification);
+			SQLException e = new SQLException("Modification already exist: "+mark+" "+model+" "+modification);
 			LOG.error("Modification already exist",e);
 			throw e;
 		}
@@ -137,11 +137,11 @@ public class CarServiceImpl
 	 * @throws Exception 
 	 */
 	public final CarDomain findOne(final String mark, final String model,
-			final String modification) throws Exception {
+			final String modification) throws SQLException {
 		MarkDAO markDAO = new MarkDAOImpl(entityManagerFactory);
 		Mark markEntity = markDAO.findOne(mark);
 		if (markEntity == null) {
-			Exception e = new Exception("Not found mark with name "+mark);
+			SQLException e = new SQLException("Not found mark with name "+mark);
 			LOG.error("Not found mark",e);
 			throw e;
 		}
@@ -149,7 +149,7 @@ public class CarServiceImpl
 		ModelDAO modelDAO = new ModelDAOImpl(entityManagerFactory);
 		CarModel modelEntity = modelDAO.findOne(markEntity, model);
 		if (modelEntity == null) {
-			Exception e = new Exception("Not found model of "+mark+" with name "+model);
+			SQLException e = new SQLException("Not found model of "+mark+" with name "+model);
 			LOG.error("Not found model",e);
 			throw e;
 		}
@@ -159,7 +159,7 @@ public class CarServiceImpl
 				modification);
 
 		if (modifEntity == null) {
-			Exception e = new Exception("Not found modification of "+mark+" "+model+" with name "+modification);
+			SQLException e = new SQLException("Not found modification of "+mark+" "+model+" with name "+modification);
 			LOG.error("Not found model",e);
 			throw e;
 		}
@@ -175,9 +175,9 @@ public class CarServiceImpl
 		return mapper.mapAsList(modif, CarDomain.class);
 	}
 
-	public List<String> getMarks() {
+	public List<CarDomain> getMarks() {
 		MarkDAO markDAO = new  MarkDAOImpl(entityManagerFactory);
-		return markDAO.findAllNames();
+		return mapper.mapAsList(markDAO.findMarks(),CarDomain.class);
 	}
 
 	public List<CarDomain> findByMarkAndModel(String markName, String modelName) {
@@ -186,6 +186,18 @@ public class CarServiceImpl
 		
 		Mapper mapper = new MainMapper();
 		return mapper.mapAsList(modif, CarDomain.class);
+	}
+
+	@Override
+	public List<CarDomain> getModels(long markId) {
+		ModelDAO modelDAO = new  ModelDAOImpl(entityManagerFactory);
+		return mapper.mapAsList(modelDAO.getModels(markId),CarDomain.class);
+	}
+
+	@Override
+	public List<CarDomain> getModifications(long modelId) {
+		ModificationDAO modifDAO = new  ModificationDAOImpl(entityManagerFactory);
+		return mapper.mapAsList(modifDAO.getModifications(modelId),CarDomain.class);
 	}
 
 }

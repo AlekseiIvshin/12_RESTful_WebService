@@ -14,6 +14,8 @@ import org.slf4j.LoggerFactory;
 
 import dao.GenericDAOImpl;
 import dao.car.mark.Mark;
+import dao.car.mark.MarkDAO;
+import dao.car.mark.MarkDAOImpl;
 
 /**
  * Model DAO implementation.
@@ -118,5 +120,27 @@ public class ModelDAOImpl extends GenericDAOImpl<CarModel, Integer> implements
 			modelData = create(modelData);
 		}
 		return modelData;
+	}
+
+	@Override
+	public List<CarModel> getModels(long markId) {
+		EntityManager entityManager = entityManagerFactory
+				.createEntityManager();
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<CarModel> query = builder.createQuery(CarModel.class);
+		Root<CarModel> root = query.from(CarModel.class);
+		MarkDAO markDao = new MarkDAOImpl(entityManagerFactory);
+		Mark mark = markDao.find((int) markId);
+		query.where(builder.equal(root.get(CarModel_.mark), mark)).select(root);
+		List<CarModel> result = null;
+		try {
+			TypedQuery<CarModel> ctq = entityManager.createQuery(query);
+			result = ctq.getResultList();
+		} catch (Exception e) {
+			LOG.error("Find one model", e);
+		} finally {
+			entityManager.close();
+		}
+		return result;
 	}
 }

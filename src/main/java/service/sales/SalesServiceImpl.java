@@ -4,10 +4,14 @@ import mapper.MainMapper;
 import mapper.Mapper;
 import service.DomainServiceImpl;
 import dao.car.modification.Modification;
+import dao.car.modification.ModificationDAO;
+import dao.car.modification.ModificationDAOImpl;
 import dao.customer.Customer;
 import dao.customer.CustomerDAO;
 import dao.customer.CustomerDAOImpl;
 import dao.merchant.Merchant;
+import dao.merchant.MerchantDAO;
+import dao.merchant.MerchantDAOImpl;
 import dao.sales.Sales;
 import dao.sales.SalesDAOImpl;
 import domain.CarDomain;
@@ -77,6 +81,25 @@ public class SalesServiceImpl extends
 		}
 		
 		Sales changedSales = dao.newSaleAndUpdateStore(persisted, merch, modif);
+		return mapper.map(changedSales, SalesDomain.class);
+	}
+
+	@Override
+	public SalesDomain newSaleAndUpdateStore(int customerId, int merchantId,
+			long carId) {
+		Mapper mapper = new MainMapper();
+		
+		MerchantDAO merchantDAO = new MerchantDAOImpl(entityManagerFactory);
+		CustomerDAO customerDAO = new CustomerDAOImpl(entityManagerFactory);
+		ModificationDAO modificationDAO = new ModificationDAOImpl(entityManagerFactory);
+		
+		
+		
+		Customer cust = customerDAO.find(customerId);
+		Merchant merch = merchantDAO.find(merchantId);
+		Modification mod = modificationDAO.find(carId);
+		
+		Sales changedSales = dao.newSaleAndUpdateStore(cust, merch, mod);
 		return mapper.map(changedSales, SalesDomain.class);
 	}
 

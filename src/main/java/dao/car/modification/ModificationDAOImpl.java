@@ -9,6 +9,7 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Join;
 import javax.persistence.criteria.Root;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,6 +18,8 @@ import dao.car.mark.Mark;
 import dao.car.mark.Mark_;
 import dao.car.model.CarModel;
 import dao.car.model.CarModel_;
+import dao.car.model.ModelDAO;
+import dao.car.model.ModelDAOImpl;
 
 /**
  * Modification DAO implementation.
@@ -147,9 +150,34 @@ public class ModificationDAOImpl extends GenericDAOImpl<Modification, Long>
 				.select(root);
 
 		List<Modification> result = null;
-		try{
+		try {
 			result = entityManager.createQuery(query).getResultList();
-		} finally{entityManager.close();
+		} finally {
+			entityManager.close();
+		}
+		return result;
+	}
+
+	@Override
+	public List<Modification> getModifications(long modelId) {
+		EntityManager entityManager = entityManagerFactory
+				.createEntityManager();
+		ModelDAO modelDao = new ModelDAOImpl(entityManagerFactory);
+		CarModel model = modelDao.find((int) modelId);
+
+		CriteriaBuilder builder = entityManager.getCriteriaBuilder();
+		CriteriaQuery<Modification> query = builder
+				.createQuery(Modification.class);
+
+		Root<Modification> root = query.from(Modification.class);
+		query.where(builder.equal(root.get(Modification_.model), model))
+				.select(root);
+
+		List<Modification> result = null;
+		try {
+			result = entityManager.createQuery(query).getResultList();
+		} finally {
+			entityManager.close();
 		}
 		return result;
 	}

@@ -2,7 +2,6 @@ package rest.helpers;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
@@ -13,12 +12,16 @@ import rest.elements.JsonExceptionData;
 
 public class ResponsePackerImpl implements ResponsePacker {
 
-	private final ObjectMapper jsonMapper = new ObjectMapper();
+	private final ObjectMapper jsonMapper;
+	
+	public ResponsePackerImpl(){
+		jsonMapper = new ObjectMapper();
+	}
 
 	public <T> Response packOk(T data) {
 		try {
 			return Response.ok(jsonMapper.writeValueAsString(packOkJson(data)),
-					MediaType.APPLICATION_JSON).build();
+					"application/json;charset=UTF-8").build();
 		} catch (IOException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
@@ -29,7 +32,7 @@ public class ResponsePackerImpl implements ResponsePacker {
 		try {
 			return Response.ok(
 					jsonMapper.writeValueAsString(packErrorJson(exception)),
-					MediaType.APPLICATION_JSON).build();
+					"application/json;charset=UTF-8").build();
 		} catch (IOException e) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
